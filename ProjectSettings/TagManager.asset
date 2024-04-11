@@ -7,6 +7,7 @@ TagManager:
   - Enemy
   - Junis
   - Sho
+  - Miko
   layers:
   - Default
   - TransparentFX
