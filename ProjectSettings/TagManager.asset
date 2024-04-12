@@ -8,6 +8,10 @@ TagManager:
   - Junis
   - Sho
   - Miko
+  - PBullet
+  - MBullet
+  - Item
+  - Item2
   layers:
   - Default
   - TransparentFX
