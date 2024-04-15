@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -11,10 +12,17 @@ public class Player : MonoBehaviour
     public GameObject bullet2;
     public Transform pos;
     public Transform pos2;
+    public GameObject item;
+    public GameObject gold;
+
+    Animator anim;
+    private bool isDeath;
+
+    private int TotalGold = 0;
 
     void Start()
     {
-        
+        anim = GetComponent<Animator>();
     }
 
 
@@ -27,8 +35,10 @@ public class Player : MonoBehaviour
 
         if(BulletLev > 2)
         {
-            BulletLev = 0;
+            BulletLev = 3;
         }
+
+        Vector2 vec2 = pos2.transform.position;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -36,21 +46,21 @@ public class Player : MonoBehaviour
             {
                 case 0:
                     NormalShoot();
-                    //Instantiate(bullet2, pos2.transform.position, Quaternion.identity);
                     break;
                 case 1:
                     NormalShoot();
-                    Instantiate(bullet2, pos2.transform.position, Quaternion.identity);
+                    Instantiate(bullet2, vec2, Quaternion.identity);
                     break;
                 case 2:
                     NormalShoot();
-                    Instantiate(bullet2, pos2.transform.position, Quaternion.identity);
-                    Instantiate(bullet2, pos2.transform.position, Quaternion.identity);
+                    Instantiate(bullet2, vec2, Quaternion.identity);
+                    Instantiate(bullet2, new Vector2(vec2.x, vec2.y + 0.2f), Quaternion.identity);
                     break;
                 case 3:
                     NormalShoot();
-                    Instantiate(bullet2, pos2.transform.position, Quaternion.identity);
-                    Invoke("ShootBullet2", 0.1f);
+                    Instantiate(bullet2, vec2, Quaternion.identity);
+                    Instantiate(bullet2, new Vector2(vec2.x, vec2.y + 0.2f), Quaternion.identity);
+                    Instantiate(bullet2, new Vector2(vec2.x, vec2.y - 0.2f), Quaternion.identity);
                     break;
             }
             
@@ -64,8 +74,25 @@ public class Player : MonoBehaviour
         Vector3 worldpos = Camera.main.ViewportToWorldPoint(viewpos);//다시월드좌표로 변환
         transform.position = worldpos; //좌표를 적용한다.
 
+        if (isDeath)
+        {
+            PlayerDeath();
+        }
 
+    }
 
+    private void PlayerDeath()
+    {
+        anim.SetBool("isDeath", true);
+        Debug.Log("isDeath"+isDeath);
+        Instantiate(item, pos.transform.position, Quaternion.identity);
+        Instantiate(gold, pos.transform.position, Quaternion.identity);
+        Invoke("SetOff", 1);
+    }
+
+    private void SetOff()
+    {
+        SceneManager.LoadScene("Start");
     }
 
     private void NormalShoot()
@@ -88,25 +115,31 @@ public class Player : MonoBehaviour
         if (collision.CompareTag("Item"))
         {
             BulletLev++;
-            Debug.Log("BulletLev" + BulletLev);
             Destroy(collision.gameObject);
             if(BulletLev > 0)
             {
                 pos2.gameObject.SetActive(true);
             }
-        }else if (collision.CompareTag("Item2"))
+        }
+        if (collision.CompareTag("Item2"))
         {
             UltCount++;
-            Debug.Log("UltCount" + UltCount);
             Destroy(collision.gameObject);
         }
-        else if (collision.CompareTag("MBullet"))
+        if (collision.CompareTag("MBullet"))
         {
             BulletLev--;
+            Debug.Log(BulletLev);
             if(BulletLev < 0)
             {
-                Destroy(gameObject);
+                isDeath = true;
             }
+        }
+        if (collision.CompareTag("Gold"))
+        {
+            TotalGold += 100;
+            Debug.Log(TotalGold);
+            Destroy(collision.gameObject);
         }
     }
 

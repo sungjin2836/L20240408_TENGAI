@@ -12,6 +12,8 @@ TagManager:
   - MBullet
   - Item
   - Item2
+  - Boss
+  - Gold
   layers:
   - Default
   - TransparentFX
